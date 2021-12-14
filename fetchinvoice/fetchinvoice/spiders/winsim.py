@@ -1,4 +1,5 @@
 from pathlib import Path
+from dateutil import parser
 
 import scrapy
 from scrapy.http import FormRequest
@@ -50,6 +51,7 @@ class WinsimInvoiceSpider(scrapy.Spider):
             INVOICE_DATE_SELECTOR = 'button.card-header > span::text'
             INVOICE_URL_SELECTOR = 'p.pdf > a::attr(href)'
             invoice_date = invoice_block.css(INVOICE_DATE_SELECTOR).extract_first().split(" ")[-1]
+            invoice_date = parser.parse(invoice_date).strftime("%Y%m%d")
             invoice_url = invoice_block.css(INVOICE_URL_SELECTOR).extract_first()
             yield scrapy.Request(url=f"https://service.winsim.de{invoice_url}", cookies=self.cookies, callback=self.save_pdf_invoice, meta={'invoice_date': invoice_date})
 
